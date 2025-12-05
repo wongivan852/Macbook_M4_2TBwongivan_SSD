@@ -96,23 +96,35 @@ du -sh ~/* 2>/dev/null | sort -hr | head -20
 
 Prevent future redundancy by excluding development artifacts from Time Machine.
 
-### Step 4a: Use Time Machine GUI (Recommended)
+**Note**: Time Machine must be configured with a backup disk first before exclusions can be added.
 
-This is the most reliable method:
+### Step 4a: Access Time Machine Settings
 
+**For macOS Tahoe/Sequoia/Ventura:**
 ```bash
-open -a "System Preferences"
+# Open System Settings directly to Time Machine
+open x-apple.systempreferences:com.apple.Time-Machine-Settings
 ```
 
-Then navigate: **Time Machine → Options...**
+**Or use Spotlight:**
+1. Press **Cmd+Space**
+2. Type "Time Machine"
+3. Open Time Machine settings
 
-Add these folders to exclude (click + and navigate to each):
+**Finding exclusion options:**
+- Look for "Options", "Exclude", or a gear/settings icon
+- May be under "Exclude from Backups" or similar
+- If no Options button appears, Time Machine may not be set up yet
+
+### Step 4b: Folders to exclude
+
+Add these folders (use Cmd+Shift+G to enter paths):
 - `~/Library/Caches`
 - `~/.npm`
 - `~/.docker`
 - Any `node_modules` folders in your projects
 
-### Step 4b: Find paths to exclude
+### Step 4c: Find paths to exclude
 
 ```bash
 # Check which dev folders exist on your system:
@@ -124,7 +136,7 @@ ls -la ~/.docker
 find ~ -name "node_modules" -type d -prune 2>/dev/null
 ```
 
-### Step 4c: Command-line alternative (if sudo works)
+### Step 4d: Command-line alternative (if sudo works)
 
 ```bash
 # Use full path to sudo if needed
@@ -136,7 +148,7 @@ find ~ -name "node_modules" -type d -prune 2>/dev/null
 /usr/bin/sudo tmutil addexclusion ~/path/to/project/node_modules
 ```
 
-### Step 4d: Verify exclusions
+### Step 4e: Verify exclusions
 
 ```bash
 # Check if a specific path is excluded

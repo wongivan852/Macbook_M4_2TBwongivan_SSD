@@ -61,6 +61,26 @@
 
 ---
 
+## Redundancy Policy
+
+**Principle**: Each file should exist in ONE primary location only (plus automated backups).
+
+| Keep on M4 Only | Keep on 2TB SSD Only |
+|-----------------|----------------------|
+| Active Git repos | Archived projects |
+| node_modules, build artifacts | Large media files |
+| IDE configs, caches | VM/disk images |
+| Work-in-progress files | Old installers (.dmg) |
+
+**Do NOT duplicate**:
+- Git repositories (use remote as backup, not SSD copies)
+- Development dependencies (regenerable from package files)
+- Build outputs (regenerable from source)
+
+See: [REDUNDANCY_REMOVAL_GUIDE.md](./REDUNDANCY_REMOVAL_GUIDE.md) for detailed cleanup steps.
+
+---
+
 ## Summary
 
 This setup follows a sensible arrangement:

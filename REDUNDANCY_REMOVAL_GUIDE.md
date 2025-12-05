@@ -94,20 +94,62 @@ du -sh ~/* 2>/dev/null | sort -hr | head -20
 
 ## Step 4: Time Machine Exclusions
 
-Prevent future redundancy by excluding development artifacts from Time Machine:
+Prevent future redundancy by excluding development artifacts from Time Machine.
+
+**Important**: Only exclude paths that actually exist on your system!
+
+### Step 4a: Find node_modules locations first
 
 ```bash
-# Add exclusions to Time Machine
-sudo tmutil addexclusion ~/node_modules
-sudo tmutil addexclusion ~/.npm
-sudo tmutil addexclusion ~/.cargo
+# Find all node_modules folders in your home directory
+find ~ -name "node_modules" -type d -prune 2>/dev/null
+```
+
+### Step 4b: Exclude paths that exist
+
+```bash
+# These paths typically exist on macOS - verify before running:
 sudo tmutil addexclusion ~/Library/Caches
 sudo tmutil addexclusion ~/Library/Developer/Xcode/DerivedData
+sudo tmutil addexclusion ~/.npm
+sudo tmutil addexclusion ~/.cargo/registry
 sudo tmutil addexclusion ~/.docker
 
-# Verify exclusions
-tmutil isexcluded ~/node_modules
+# Exclude node_modules in your actual project directories:
+# Example (replace with your actual project paths):
+# sudo tmutil addexclusion ~/Code/my-project/node_modules
+# sudo tmutil addexclusion ~/Projects/another-project/node_modules
 ```
+
+### Step 4c: Batch exclude all node_modules
+
+```bash
+# Find and exclude ALL node_modules folders at once:
+find ~ -name "node_modules" -type d -prune 2>/dev/null | while read dir; do
+  echo "Excluding: $dir"
+  sudo tmutil addexclusion "$dir"
+done
+```
+
+### Step 4d: Verify exclusions
+
+```bash
+# Check if a specific path is excluded
+tmutil isexcluded ~/Library/Caches
+tmutil isexcluded ~/.npm
+
+# List all exclusions (if available)
+sudo mdfind "com_apple_backup_excludeItem = 'com.apple.backupd'"
+```
+
+### Alternative: Use Time Machine GUI
+
+```bash
+# Open Time Machine preferences to add exclusions visually
+open /System/Library/PreferencePanes/TimeMachine.prefPane
+```
+
+Then click "Options..." and add folders to exclude.
 
 ---
 

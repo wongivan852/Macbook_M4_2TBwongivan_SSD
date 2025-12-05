@@ -105,23 +105,37 @@ Prevent future redundancy by excluding development artifacts from Time Machine.
 find ~ -name "node_modules" -type d -prune 2>/dev/null
 ```
 
-### Step 4b: Exclude paths that exist
+### Step 4b: Exclude paths that exist (safe script)
 
 ```bash
-# These paths typically exist on macOS - verify before running:
-sudo tmutil addexclusion ~/Library/Caches
-sudo tmutil addexclusion ~/Library/Developer/Xcode/DerivedData
-sudo tmutil addexclusion ~/.npm
-sudo tmutil addexclusion ~/.cargo/registry
-sudo tmutil addexclusion ~/.docker
+# Safe script - only excludes paths that actually exist on your system
+for path in \
+  ~/Library/Caches \
+  ~/Library/Developer/Xcode/DerivedData \
+  ~/.npm \
+  ~/.cargo/registry \
+  ~/.docker \
+  ~/Library/Application\ Support/Claude/logs
+do
+  if [ -e "$path" ]; then
+    echo "Excluding: $path"
+    sudo tmutil addexclusion "$path"
+  else
+    echo "Skipping (doesn't exist): $path"
+  fi
+done
+```
 
+### Step 4c: Exclude node_modules in project directories
+
+```bash
 # Exclude node_modules in your actual project directories:
 # Example (replace with your actual project paths):
 # sudo tmutil addexclusion ~/Code/my-project/node_modules
 # sudo tmutil addexclusion ~/Projects/another-project/node_modules
 ```
 
-### Step 4c: Batch exclude all node_modules
+### Step 4e: Batch exclude all node_modules
 
 ```bash
 # Find and exclude ALL node_modules folders at once:
@@ -131,7 +145,7 @@ find ~ -name "node_modules" -type d -prune 2>/dev/null | while read dir; do
 done
 ```
 
-### Step 4d: Verify exclusions
+### Step 4f: Verify exclusions
 
 ```bash
 # Check if a specific path is excluded

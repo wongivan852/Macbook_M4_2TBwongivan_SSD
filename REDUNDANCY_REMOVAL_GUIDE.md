@@ -96,74 +96,54 @@ du -sh ~/* 2>/dev/null | sort -hr | head -20
 
 Prevent future redundancy by excluding development artifacts from Time Machine.
 
-**Important**: Only exclude paths that actually exist on your system!
+### Step 4a: Use Time Machine GUI (Recommended)
 
-### Step 4a: Find node_modules locations first
+This is the most reliable method:
 
 ```bash
-# Find all node_modules folders in your home directory
+open -a "System Preferences"
+```
+
+Then navigate: **Time Machine → Options...**
+
+Add these folders to exclude (click + and navigate to each):
+- `~/Library/Caches`
+- `~/.npm`
+- `~/.docker`
+- Any `node_modules` folders in your projects
+
+### Step 4b: Find paths to exclude
+
+```bash
+# Check which dev folders exist on your system:
+ls -la ~/Library/Caches
+ls -la ~/.npm
+ls -la ~/.docker
+
+# Find all node_modules folders:
 find ~ -name "node_modules" -type d -prune 2>/dev/null
 ```
 
-### Step 4b: Exclude paths that exist (safe script)
+### Step 4c: Command-line alternative (if sudo works)
 
 ```bash
-# Safe script - only excludes paths that actually exist on your system
-for path in \
-  ~/Library/Caches \
-  ~/Library/Developer/Xcode/DerivedData \
-  ~/.npm \
-  ~/.cargo/registry \
-  ~/.docker \
-  ~/Library/Application\ Support/Claude/logs
-do
-  if [ -e "$path" ]; then
-    echo "Excluding: $path"
-    sudo tmutil addexclusion "$path"
-  else
-    echo "Skipping (doesn't exist): $path"
-  fi
-done
+# Use full path to sudo if needed
+/usr/bin/sudo tmutil addexclusion ~/Library/Caches
+/usr/bin/sudo tmutil addexclusion ~/.npm
+/usr/bin/sudo tmutil addexclusion ~/.docker
+
+# For node_modules in projects:
+/usr/bin/sudo tmutil addexclusion ~/path/to/project/node_modules
 ```
 
-### Step 4c: Exclude node_modules in project directories
-
-```bash
-# Exclude node_modules in your actual project directories:
-# Example (replace with your actual project paths):
-# sudo tmutil addexclusion ~/Code/my-project/node_modules
-# sudo tmutil addexclusion ~/Projects/another-project/node_modules
-```
-
-### Step 4e: Batch exclude all node_modules
-
-```bash
-# Find and exclude ALL node_modules folders at once:
-find ~ -name "node_modules" -type d -prune 2>/dev/null | while read dir; do
-  echo "Excluding: $dir"
-  sudo tmutil addexclusion "$dir"
-done
-```
-
-### Step 4f: Verify exclusions
+### Step 4d: Verify exclusions
 
 ```bash
 # Check if a specific path is excluded
 tmutil isexcluded ~/Library/Caches
 tmutil isexcluded ~/.npm
-
-# List all exclusions (if available)
-sudo mdfind "com_apple_backup_excludeItem = 'com.apple.backupd'"
+tmutil isexcluded ~/.docker
 ```
-
-### Alternative: Use Time Machine GUI
-
-```bash
-# Open Time Machine preferences to add exclusions visually
-open /System/Library/PreferencePanes/TimeMachine.prefPane
-```
-
-Then click "Options..." and add folders to exclude.
 
 ---
 
